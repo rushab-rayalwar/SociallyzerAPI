@@ -66,7 +66,7 @@ export function generateUniquePostId() {
 }
 
 export default class Post {
-    constructor(userId,postId,caption,imageFileExtension) {
+    constructor(userId,postId,caption,imageFileExtension,draft = false) {
         this.userId = userId;
         this.caption = caption;
         this.id = postId;
@@ -75,11 +75,13 @@ export default class Post {
         this.imageFileExtension = imageFileExtension; // NOTE : this is useful for searching if the picture exists before sending it as a response
         this.likes = 0; // the post object will only contain the number of likes. Other details like the list of users who liked is stored in the likes modal / likes object for that post
         this.comments = 0; // post obj will contain only the number of comments. The comments can be retieved from the comments modal / comments object
-        this.captionKeywords = caption.trim().toLowerCase().replace(/[^a-zA-Z0-9\s]/g,'').split(/\s+/).filter(word=>!stopWords.includes(word));//NOTE 
+        this.captionKeywords = caption.trim().toLowerCase().replace(/[^a-zA-Z0-9\s]/g,'').split(/\s+/).filter(word=>!stopWords.includes(word));//NOTE
+        this.isDraft = draft;
     }
     //static methods
     static getAll(){
-        return {posts};
+        let allPosts = posts.filter(p=>!p.draft);
+        return {allPosts};
     }
     static getById(id){
         let post = posts.find(p=>p.id === id);
@@ -177,6 +179,14 @@ export default class Post {
         } else {
             return {success:true,posts:matchingPosts,message:"Matching posts found!",code:200}
         }
+    }
+    static getDrafts(userId){
+        // userId is extracted from the JWT token. Hence no additional verification is needed
+        let draftPosts = posts.filter(p=>p.userId===userId && p.isDraft);
+        if(draftPosts.length === 0){
+            return {success:true,code:200,message:"No posts saved as draft.", data:[]}
+        }
+        return {success:true,code:200,message:"Draft posts fetched successfully", data:draftPosts};
     }
     //instance methods
 }

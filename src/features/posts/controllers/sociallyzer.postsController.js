@@ -51,9 +51,14 @@ export default class PostController {
         if(caption.length == 0) throw new ApplicationError(400,'Caption cannot be empty');  // since only one field is to be validated, no third party module like 'express-validator' is used. Image files are validated by fileUploader middleware using multer's filter configuration
         let userId = req.tokenPayload.userId;
         let postId = req.customData.postId;
+        let isDraft = !!req.params.isDraft;
         let imageFileExtension = req.customData.imageFileExtension;
-        let post = PostsModel.add(userId,postId,caption,imageFileExtension);
+        let post = PostsModel.add(userId,postId,caption,imageFileExtension,isDraft);
         return res.status(post.code).json({success:post.added,post:post.details});
+    }
+    addDraft(req,res){
+        req.params.isDraft = true;        // manually adding a parameter stating that the post should be added as a draft
+        this.addPost(req,res);
     }
     getPicture(req,res){
         let userId = req.params.userId;
@@ -79,6 +84,14 @@ export default class PostController {
     getFilteredPosts(req,res){
         let query = req.query.filter;
         let filteredPosts = PostsModel.getfilteredPosts(query);
-        
+        if(!filteredPosts.success){
+            throw new ApplicationError(filteredPosts.code,filteredPosts.message);
+        }
+        return res.status(filteredPosts.code).json({success:filteredPosts.success,message:filteredPosts.message,data:filteredPosts.posts});
+    }
+    getDrafts(req,res){
+        let userId = req.tokenPayload.userId;
+        let response = PostsModel.getDrafts(userId);
+        return res.status(response.code).json({success:response.success,message:response.message,data:response.data});
     }
 }
