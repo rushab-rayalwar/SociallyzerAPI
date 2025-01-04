@@ -1,0 +1,27 @@
+{
+  "name": "sociallyzer",
+  "version": "1.0.0",
+  "description": "A social media app",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "keywords": [
+    "social",
+    "media",
+    "RESTful",
+    "api"
+  ],
+  "type": "module",
+  "author": "Rushab Rayalwar",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.1",
+    "express-validator": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "winston": "^3.17.0"
+  }
+}

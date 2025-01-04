@@ -1,0 +1,84 @@
+//core modules
+import path from 'path';
+
+//third-party modules
+
+//custom modules
+import PostsModel from '../models/sociallyzer.postsModel.js';
+import { ApplicationError } from '../../../middlewares/sociallyzer.middleware.errorHandler.js';
+
+export default class PostController {
+    //static methods
+
+    //instance methods
+    getAll(req,res){
+        let response = PostsModel.getAll();
+        if(response.posts.length > 0){
+            return res.status(200).json({success:true,posts:response.posts});
+        } else {
+            new ApplicationError(404,'Nothing posted yet!');
+        }
+    }
+    getSpecificPost(req,res){
+        let postId = req.params.id;
+        let post = PostsModel.getById(postId);
+        if(post.found){
+            return res.status(post.code).json({success:true,post:post.details});
+        } else {
+            throw new ApplicationError(post.code,post.message);
+        }
+    }
+    getUserPosts(req,res){
+        let userID = req.tokenPayload.userId;
+        let posts = PostsModel.getForUser(userID);
+        if(posts.found){
+            return res.status(posts.code).json({success:true,posts:posts.details,message:posts.message})
+        } else {
+            return res.status(posts.code).json({success:true,posts:[],message:posts.message});
+        }
+    }
+    getPostsForUserId(req,res){
+        let userId = req.params.userId;
+        let posts = PostsModel.getPostsForUserId(userId);
+        if(posts.success){
+            return res.status(posts.code).json({success:true,message:posts.message,data:posts.data})
+        } else {
+            throw new ApplicationError(posts.code,posts.message);
+        }
+    }
+    addPost(req,res){
+        let {caption} = req.body;
+        if(caption.length == 0) throw new ApplicationError(400,'Caption cannot be empty');  // since only one field is to be validated, no third party module like 'express-validator' is used. Image files are validated by fileUploader middleware using multer's filter configuration
+        let userId = req.tokenPayload.userId;
+        let postId = req.customData.postId;
+        let imageFileExtension = req.customData.imageFileExtension;
+        let post = PostsModel.add(userId,postId,caption,imageFileExtension);
+        return res.status(post.code).json({success:post.added,post:post.details});
+    }
+    getPicture(req,res){
+        let userId = req.params.userId;
+        let postId = req.params.postId;
+        let picture = PostsModel.getPicture(userId,postId);
+        if(picture.accessible){
+            res.status(picture.code).sendFile(picture.path);  // NOTE this: this is an asynchronous method
+        } else {
+            res.status(picture.code).sendFile(path.join(process.cwd(),'uploads','Error.jpg'));
+        }
+    }
+    deletePost(req,res){
+        let postId = req.params.id;
+        let userId = req.tokenPayload.userId;
+        let postDeleted = PostsModel.delete(postId,userId);
+        if(postDeleted.success){
+            return res.status(postDeleted.code).json({success:true,deletedPostId});
+        } else {
+            throw new ApplicationError(postDeleted.code,postDeleted.message);
+        }
+    }
+    
+    getFilteredPosts(req,res){
+        let query = req.query.filter;
+        let filteredPosts = PostsModel.getfilteredPosts(query);
+        
+    }
+}
