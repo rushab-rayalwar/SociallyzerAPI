@@ -39,7 +39,12 @@ export let posts = [
         id:'lake',
         pictureUrl:'/api/posts/pics/defaultUser/lake',
         timeStamp:0,
-        imageFileExtension: '.jpg'
+        imageFileExtension: '.jpg',
+        likes: 0,
+        comments: 0,
+        captionKeywords: ['good','picture'],
+        isDraft: false,
+        isArchived: false
     },
     {
         userId:'defaultUser',
@@ -47,7 +52,12 @@ export let posts = [
         id:'tree',
         pictureUrl:'/api/posts/pics/defaultUser/tree',
         timeStamp:0,
-        imageFileExtension: '.jpg'
+        imageFileExtension: '.jpg',
+        likes: 0,
+        comments: 0,
+        captionKeywords: ['night','calm'],
+        isDraft: false,
+        isArchived: false
     },
     {
         userId:'defaultUser',
@@ -55,7 +65,12 @@ export let posts = [
         id:'bird',
         pictureUrl:'/api/posts/pics/defaultUser/bird',
         timeStamp:0,
-        imageFileExtension: '.jpg'
+        imageFileExtension: '.jpg',
+        likes: 0,
+        comments: 0,
+        captionKeywords: ['blessing','feed','bird','picture'],
+        isDraft: false,
+        isArchived: false
     }
 ];
 
@@ -75,13 +90,15 @@ export default class Post {
         this.imageFileExtension = imageFileExtension; // NOTE : this is useful for searching if the picture exists before sending it as a response
         this.likes = 0; // the post object will only contain the number of likes. Other details like the list of users who liked is stored in the likes modal / likes object for that post
         this.comments = 0; // post obj will contain only the number of comments. The comments can be retieved from the comments modal / comments object
+        
         this.captionKeywords = caption.trim().toLowerCase().replace(/[^a-zA-Z0-9\s]/g,'').split(/\s+/).filter(word=>!stopWords.includes(word));//NOTE
         this.isDraft = draft;
+        this.isArchived = false;
     }
     //static methods
     static getAll(){
-        let allPosts = posts.filter(p=>!p.draft);
-        return {allPosts};
+        let allPosts = posts.filter(p=>!p.isDraft&&!p.isArchived);
+        return {posts:allPosts};
     }
     static getById(id){
         let post = posts.find(p=>p.id === id);
@@ -106,16 +123,16 @@ export default class Post {
             };
         });
         if(!userExists){
-            return {success:false,message:"Could not find the user with the specified userID.",code:404,data:[]};
+            return {success:false,message:"Could not find the user with the specified userID",code:404,data:[]};
         }
         let postsByUser = posts.filter(post=>post.userId===userId);
         if(postsByUser.length==0){
             return {success:true,message:'No posts posted by the user.',code:200,data:[]};
         }
-        return {success:true,message:"Posts retrieved successfully.",code:200,data:postsByUser}
+        return {success:true,message:"Posts retrieved successfully",code:200,data:postsByUser}
     }
-    static add(userId,postId,caption,imageFileExtension){console.log(imageFileExtension);
-        let post = new Post(userId,postId,caption,imageFileExtension);
+    static add(userId,postId,caption,imageFileExtension,isDraft){
+        let post = new Post(userId,postId,caption,imageFileExtension,isDraft);
         posts.push(post);
         return {added:true, details:post, code:200};
     }
@@ -157,12 +174,12 @@ export default class Post {
                         }
                     });
                 }
-                return {success:true,deletedPostId,code:204,message:"Post deleted successfully!"};
+                return {success:true,deletedPostId,code:200,message:"Post deleted successfully"};
             } else {
-                return {success:false,deletedPostId:null,code:401,message:"User unauthorized!"};
+                return {success:false,deletedPostId:null,code:401,message:"User unauthorized"};
             }
         } else {
-            return {success:false,deletedPostId:null,code:404,message:"Post to be deleted does not exist!"};
+            return {success:false,deletedPostId:null,code:404,message:"Post to be deleted does not exist"};
         }
     }
     static getfilteredPosts(query){
@@ -177,16 +194,31 @@ export default class Post {
         if(matchingPosts.length===0){
             return {success:true,posts:[],message:"No matching posts found...",code:404}
         } else {
-            return {success:true,posts:matchingPosts,message:"Matching posts found!",code:200}
+            return {success:true,posts:matchingPosts,message:"Matching posts found",code:200}
         }
     }
     static getDrafts(userId){
         // userId is extracted from the JWT token. Hence no additional verification is needed
         let draftPosts = posts.filter(p=>p.userId===userId && p.isDraft);
         if(draftPosts.length === 0){
-            return {success:true,code:200,message:"No posts saved as draft.", data:[]}
+            return {success:true,code:200,message:"No posts saved as draft", data:[]}
         }
         return {success:true,code:200,message:"Draft posts fetched successfully", data:draftPosts};
+    }
+    static toggleArchive(userId,postId){
+        let postIndex = posts.findindex(p=>p.id===postId);
+        if(postIndex < 0){
+            return {success:false,code:400,message:"Invalid Post ID"}
+        }
+        let post = posts[postIndex];
+        if(!post.userId === userId){
+            return {success:false,code:403,message:"Unauthorized"}
+        }
+        if(post.isDraft){
+            return {success:false,code:400,message:"Cannot add draft to the archive"}
+        }
+        post.isArchived = !post.isArchived;
+        return {success:true,code:200,message:""}
     }
     //instance methods
 }

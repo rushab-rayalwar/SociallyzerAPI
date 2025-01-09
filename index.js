@@ -21,7 +21,7 @@ app.use(express.urlencoded({extended:true}));
 
 app.use(reqLogger);
 app.use('/api/users',userRouter);
-app.use('/api/posts',authenticateUser,postsRouter);
+app.use('/api/posts',authenticateUser,postsRouter); 
 app.use('/api/likes',authenticateUser,likesRouter);
 app.use('/api/comments',authenticateUser,commentsRouter);
 
