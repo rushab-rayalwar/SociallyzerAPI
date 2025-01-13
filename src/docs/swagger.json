@@ -1,0 +1,92 @@
+{
+    "swagger":"2.0",
+    "info":{
+        "version":"1.0.0",
+        "title":"SociallyzerAPI",
+        "description": "Sociallyzer API is a feature-rich social networking API built as a learning project. It includes functionalities such as user authentication, post creation, editing, and deletion, as well as features like liking, commenting, and filtering posts by interactions or keywords. With pagination, draft saving, and archiving capabilities, Sociallyzer demonstrates efficient RESTful API design and implementation."
+    },
+    "host":"localhost:3000",
+    "schemes":["http"],
+    "paths":{
+        "/api/users/register":{
+            "post":{
+                "summary":"User Account Registration",
+                "description":"For creating a new user account.",
+                "parameters":[
+                    {
+                        "in":"body",
+                        "name":"Data",
+                        "description":"User Account Credentials",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "name":{
+                                    "type":"string",
+                                    "example":"John Doe",
+                                    "description":"Name of the user."
+                                },
+                                "email":{
+                                    "type":"string",
+                                    "example":"johndoe@abc.com",
+                                    "description":"User's Email ID"
+                                },
+                                "password":{
+                                    "type":"string",
+                                    "example":"abc123#",
+                                    "description":"User's password"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses":{
+                    "201":{
+                        "description":"User Registration Successfull.",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "success":{
+                                    "type":"boolean",
+                                    "description":"Indicates if the operation was successfull."
+                                },
+                                "message":{
+                                    "type":"string",
+                                    "description":"Information about the operation"
+                                },
+                                "userId":{
+                                    "type":"string",
+                                    "description":"User ID of the new account."
+                                }
+                            },
+                            "example":{
+                                "success":true,
+                                "message":"User Registration Successfull.",
+                                "userId":"xyz123#"
+                            }
+                        }
+                    },
+                    "400":{
+                        "description":"Bad Request: Invalid User Data",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "success":{
+                                    "type":"boolean",
+                                    "description":"Indicates if the operation was successfull."
+                                },
+                                "message":{
+                                    "type":"string",
+                                    "description":"Information about the operation"
+                                } 
+                            },
+                            "example":{
+                                "success":false,
+                                "message":"Invalid User Data"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
