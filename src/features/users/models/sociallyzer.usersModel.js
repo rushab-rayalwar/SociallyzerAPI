@@ -37,9 +37,9 @@ export class User {
     static confirmLogin(email,password){
         let user = users.find(u=>u.email===email);
         if(user){
-            return bcrypt.compareSync(password,user.password) ? {success:true,user}:{success:false,message:'Invalid Password'};
+            return bcrypt.compareSync(password,user.password) ? {success:true,user}:{success:false,message:'Invalid Credentials'};
         } else {
-            return {success:false,message:`User not found`};
+            return {success:false,message:`Invalid Credentials`};
         }
     }
     //instance methods

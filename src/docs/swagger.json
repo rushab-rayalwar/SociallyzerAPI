@@ -5,11 +5,19 @@
         "title":"SociallyzerAPI",
         "description": "Sociallyzer API is a feature-rich social networking API built as a learning project. It includes functionalities such as user authentication, post creation, editing, and deletion, as well as features like liking, commenting, and filtering posts by interactions or keywords. With pagination, draft saving, and archiving capabilities, Sociallyzer demonstrates efficient RESTful API design and implementation."
     },
+    "tags":[
+        {
+            "name":"Users",
+            "description":"Endpoints related to user operations"
+        }
+    ],
     "host":"localhost:3000",
     "schemes":["http"],
     "paths":{
+
         "/api/users/register":{
             "post":{
+                "tags":["Users"],
                 "summary":"User Account Registration",
                 "description":"For creating a new user account.",
                 "parameters":[
@@ -82,6 +90,81 @@
                             "example":{
                                 "success":false,
                                 "message":"Invalid User Data"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "api/users/login":{
+            "post":{
+                "tags":["Users"],
+                "summary":"User Login",
+                "description":"For logging into a user account.",
+                "parameters":[
+                    {
+                        "in":"body",
+                        "name":"User Credentials",
+                        "description":"User Account Credentials",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "email":{
+                                    "type":"string",
+                                    "description":"Email linked to the user account",
+                                    "example":"johndoe@abc.com"
+                                },
+                                "password":{
+                                    "type":"string",
+                                    "description":"Password for the user account",
+                                    "example":"abc123#"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Login successfull",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "success":{
+                                    "type":"boolean",
+                                    "description":"A boolean value representing if login was successfull"
+                                },
+                                "message":{
+                                    "type":"string",
+                                    "description":"Info abou the operation"
+                                },
+                                "userId":{
+                                    "type":"string",
+                                    "description":"ID of the user account currently logged in"
+                                }
+                            },
+                            "example":{
+                                "success":true,
+                                "message":"Login Successfull",
+                                "userId":"egDkljlkEeslkahd134lklk"
+                            }
+                        }
+                    },
+                    "401":{
+                        "description":"Invalid Credentials",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "success":{
+                                    "type":"boolean",
+                                    "description":"Represents if login was successfull"
+                                },
+                                "message":{
+                                    "description":"Information about the operation"
+                                }
+                            },
+                            "example":{
+                                "success":false,
+                                "message":"Invalid Credentials"
                             }
                         }
                     }
