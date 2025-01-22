@@ -105,15 +105,19 @@ export default class Post {
         if(post){
             return {found:true, details:post, code:200, message:"Post retrieved successfully"};
         } else {
-            return {found:false, details:null, code:404, message:"Could not find the post"};
+            return {found:false, details:null, code:404, message:"Invalid Post Id"};
         }
     }
     static getForUser(userID){         // for posts posted by the user sending the request
-        let postsForUser = posts.filter(p=>{p.userId === userID});
-        if(postsForUser.lenght > 0){
+        let postsForUser = posts.filter(p=>{
+            if(p.userId === userID){
+                return true;
+            }
+        });
+        if(postsForUser.length > 0){
             return {found:true, details:postsForUser,code:200,message:"Posts retrieved successfully"}
         } else {
-            return {found:false, details:null,code:404,message:'No posts yet!'}
+            return {found:false, details:null,code:200,message:'No posts yet!'}
         }
     }
     static getPostsForUserId(userId){       // for any other user's posts
@@ -163,8 +167,7 @@ export default class Post {
         if(postIndex >= 0){
             let userAuthorised = (posts[postIndex].userId == userId);
             if(userAuthorised){
-                let deletedPostId = posts[postIndex].id;
-                posts.splice(postIndex,1);
+                let deletedPostId = posts[postIndex].id; console.log(deletedPostId);
                 let imagePath = path.join(process.cwd(),'uploads',userId,`${postId}${posts[postIndex].imageFileExtension}`);
                 let imageFileExists = fs.existsSync(imagePath);
                 if(imageFileExists){
@@ -174,12 +177,13 @@ export default class Post {
                         }
                     });
                 }
+                posts.splice(postIndex,1);
                 return {success:true,deletedPostId,code:200,message:"Post deleted successfully"};
             } else {
-                return {success:false,deletedPostId:null,code:401,message:"User unauthorized"};
+                return {success:false,deletedPostId:null,code:403,message:"Unauthorized"};
             }
         } else {
-            return {success:false,deletedPostId:null,code:404,message:"Post to be deleted does not exist"};
+            return {success:false,deletedPostId:null,code:404,message:"Post does not exist"};
         }
     }
     static getfilteredPosts(query){
@@ -201,28 +205,42 @@ export default class Post {
         // userId is extracted from the JWT token. Hence no additional verification is needed
         let draftPosts = posts.filter(p=>p.userId===userId && p.isDraft);
         if(draftPosts.length === 0){
-            return {success:true,code:200,message:"No posts saved as draft", data:[]}
+            return {success:true,code:200,message:"No drafts.", data:[]}
         }
         return {success:true,code:200,message:"Draft posts fetched successfully", data:draftPosts};
     }
     static toggleArchive(userId,postId){
-        let postIndex = posts.findindex(p=>p.id===postId);
-        if(postIndex < 0){
-            return {success:false,code:400,message:"Invalid Post ID"}
+        let index = posts.findIndex(p=>p.id===postId);
+        if(index<0){
+            return {success:false,code:404,message:"Post does not exist"}
         }
-        let post = posts[postIndex];
-        if(!post.userId === userId){
+        let ownerOfThePost = posts[index].userId;
+        if(ownerOfThePost !== userId){
             return {success:false,code:403,message:"Unauthorized"}
         }
-        if(post.isDraft){
-            return {success:false,code:400,message:"Cannot add draft to the archive"}
-        }
-        post.isArchived = !post.isArchived;
-        return {success:true,code:200,message:""}
+        let currentStatus = posts[index].isArchived;
+        posts[index].isArchived = !currentStatus;
+        let responseMessage = currentStatus ? 'Post has been unarchived' : 'Post has been archived';
+        return {success:true,code:200,message:responseMessage}
     }
     static searchFor(query,page,limit){
         let keywords = query.toLowerCase().trim().replace(/[^a-z0-9\s]/g,'').split(/\s+/); // NOTE the first req-ex selects all everything that is not a lower case, not a digit and not a white space globally and, the second matches one or more whitespace characters (spaces, tabs, etc.)
         let posts = new Set(posts.filter(p=>!p.isDraft&&!p.isArchived))
+    }
+    static postDraft(userId,draftId){
+        let index = posts.findIndex(p=>p.isDraft&&p.id===draftId&&p.userId===userId); //  three conditions are: 1. the post is a draft, 2. the post id matches the draft id, 3. the user id matches the user id of the user sending the request
+        if(index < 0){
+            return {success:false,code:400,message:"Invaild Draft ID"}
+        }
+        posts[index].isDraft = false;
+        return {success:true,code:200,message:"Draft has been posted"}
+    }
+    static getArchivedPosts(userId){
+        let archivedPosts = posts.filter(p=>p.userId===userId&&p.isArchived);
+        if(archivedPosts.length===0){
+            return {success:true,code:200,message:"No archived posts",data:[]}
+        }
+        return {success:true,code:200,message:"Archived posts fetched successfully",data:archivedPosts}
     }
     //instance methods
 }

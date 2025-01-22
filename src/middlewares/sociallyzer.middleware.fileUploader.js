@@ -24,7 +24,7 @@ let storageOptions = multer.diskStorage({
     },
     filename: (req,file,cb)=>{
         req.customData = {};
-        req.customData.postId = generateUniquePostId();console.log(req.customData.postId);// NOTE postid is being generated here because, the image has to be saved by the name of the postId
+        req.customData.postId = generateUniquePostId();// NOTE postid is being generated here because, the image has to be saved by the name of the postId
         req.customData.imageFileExtension = (file.mimetype == 'image/jpeg' || file.mimetype == 'image/jpg') ? '.jpg' : '.png'; // NOTE this
         let name = req.customData.postId+req.customData.imageFileExtension;
         cb(null,name);

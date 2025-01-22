@@ -48,7 +48,8 @@ export default class PostController {
     }
     addPost(req,res){
         let {caption} = req.body;
-        if(caption.length == 0) throw new ApplicationError(400,'Caption cannot be empty');  // since only one field is to be validated, no third party module like 'express-validator' is used. Image files are validated by fileUploader middleware using multer's filter configuration
+        if(!req.file) throw new ApplicationError(400,"Post image is required.")
+        if( !caption || caption.length == 0 ) throw new ApplicationError(400,'Caption cannot be empty.');
         let userId = req.tokenPayload.userId;
         let postId = req.customData.postId;
         let isDraft = !!req.params.isDraft;
@@ -58,8 +59,9 @@ export default class PostController {
     }
     addDraft(req,res){
         let isDraft = true;        
-        let {caption} = req.body; console.log('caption is',caption);
-        if(caption.length == 0) throw new ApplicationError(400,'Caption cannot be empty');  // since only one field is to be validated, no third party module like 'express-validator' is used. Image files are validated by fileUploader middleware using multer's filter configuration
+        let {caption} = req.body;
+        if(!req.file) throw new ApplicationError(400,"Post image is required.")
+        if( !caption || caption.length == 0 ) throw new ApplicationError(400,'Caption cannot be empty.');
         let userId = req.tokenPayload.userId;
         let postId = req.customData.postId;
         let imageFileExtension = req.customData.imageFileExtension;
@@ -103,10 +105,34 @@ export default class PostController {
     toggleArchive(req,res){
         let userId = req.tokenPayload.userId;
         let postId = req.params.postId;
-        let response = PostsModel.archivePost(userId,postId);
+        let response = PostsModel.toggleArchive(userId,postId);
+        if(response.success){
+            return res.status(response.code).json({success:response.success,message:response.message})
+        } else {
+            return res.status(response.code).json({success:response.success,message:response.message})
+        }
     }
     searchPosts(req,res){
         let {query,page,limit} = req.query;
         let response = PostsModel.searchFor(query,page,limit);
+    }
+    postDraft(req,res){
+        let draftId = req.params.id;
+        let userId = req.tokenPayload.userId;
+        let response = PostsModel.postDraft(userId,draftId);
+        if(response.success){
+            return res.status(response.code).json({success:true,message:response.message});
+        } else {
+            throw new ApplicationError(response.code,response.message);
+        }
+    }
+    getArchivedPosts(req,res){
+        let userId = req.tokenPayload.userId;
+        let response = PostsModel.getArchivedPosts(userId);
+        if(response.success){
+            return res.status(response.code).json({success:true,message:response.message,data:response.data});
+        } else {
+            throw new ApplicationError(response.code,response.message);
+        }
     }
 }
