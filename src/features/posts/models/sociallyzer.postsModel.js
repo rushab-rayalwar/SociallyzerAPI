@@ -35,40 +35,40 @@ let stopWords = [
 export let posts = [
     {
         userId:'defaultUser',
-        caption:'Heyy! I captured a really good picture today!!',
+        caption:'Heyy! I captured a really good picture today!! ( This is a default post )',
         id:'lake',
         pictureUrl:'/api/posts/pics/defaultUser/lake',
         timeStamp:0,
         imageFileExtension: '.jpg',
         likes: 0,
         comments: 0,
-        captionKeywords: ['good','picture'],
+        captionKeywords: ['good','picture','default'],
         isDraft: false,
         isArchived: false
     },
     {
         userId:'defaultUser',
-        caption:'The calm night!',
+        caption:'The calm night! ( This is a default post )',
         id:'tree',
         pictureUrl:'/api/posts/pics/defaultUser/tree',
         timeStamp:0,
         imageFileExtension: '.jpg',
         likes: 0,
         comments: 0,
-        captionKeywords: ['night','calm'],
+        captionKeywords: ['night','calm','default'],
         isDraft: false,
         isArchived: false
     },
     {
         userId:'defaultUser',
-        caption:'Blessing your feed with an awesome bird picture!!',
+        caption:'Blessing your feed with an awesome bird picture!! (This is a default post )',
         id:'bird',
         pictureUrl:'/api/posts/pics/defaultUser/bird',
         timeStamp:0,
         imageFileExtension: '.jpg',
         likes: 0,
         comments: 0,
-        captionKeywords: ['blessing','feed','bird','picture'],
+        captionKeywords: ['blessing','feed','bird','picture','default'],
         isDraft: false,
         isArchived: false
     }
@@ -100,24 +100,24 @@ export default class Post {
         let allPosts = posts.filter(p=>!p.isDraft&&!p.isArchived);
         return {posts:allPosts};
     }
-    static getById(id){
-        let post = posts.find(p=>p.id === id);
+    static getById(postId,userId){
+        let post = posts.find(p=>{
+            let idIsValid = (p.id === postId);
+            let postIsAccessible =  ( p.isDraft || p.isArchived ) ? (p.userId === userId) : true;
+            return idIsValid && postIsAccessible;
+        });
         if(post){
             return {found:true, details:post, code:200, message:"Post retrieved successfully"};
         } else {
-            return {found:false, details:null, code:404, message:"Invalid Post Id"};
+            return {found:false, details:null, code:404, message:"Post not found or access deined"};
         }
     }
     static getForUser(userID){         // for posts posted by the user sending the request
-        let postsForUser = posts.filter(p=>{
-            if(p.userId === userID){
-                return true;
-            }
-        });
+        let postsForUser = posts.filter(p=>p.userId === userID && !p.isDraft && !p.isArchived);
         if(postsForUser.length > 0){
             return {found:true, details:postsForUser,code:200,message:"Posts retrieved successfully"}
         } else {
-            return {found:false, details:null,code:200,message:'No posts yet!'}
+            return {found:false, details:null,code:200,message:'Nothing posted yet!'}
         }
     }
     static getPostsForUserId(userId){       // for any other user's posts
@@ -127,9 +127,9 @@ export default class Post {
             };
         });
         if(!userExists){
-            return {success:false,message:"Could not find the user with the specified userID",code:404,data:[]};
+            return {success:false,message:"Could not find the user.",code:404,data:[]};
         }
-        let postsByUser = posts.filter(post=>post.userId===userId);
+        let postsByUser = posts.filter(post=>post.userId===userId && !p.isDraft && !p.isArchived);
         if(postsByUser.length==0){
             return {success:true,message:'No posts posted by the user.',code:200,data:[]};
         }
@@ -140,51 +140,72 @@ export default class Post {
         posts.push(post);
         return {added:true, details:post, code:200};
     }
-    static getPost(userId,postId) {
-        let post = posts.find(p=>p.id == postId && p.userId == userId);
-        if(!!post){
-            return {exists:true,message:null,details:post,code:200}
-        } else {
-            return {exists:false,message:'Post by user does not exist',details:null,code:404};
-        }
-    }
+    // static getPost(userId,postId) {
+    //     let post = posts.find(p=>p.id == postId && p.userId == userId);
+    //     if(!!post){
+    //         return {exists:true,message:null,details:post,code:200}
+    //     } else {
+    //         return {exists:false,message:'Post by user does not exist',details:null,code:404};
+    //     }
+    // }
     static getPicture(userId,postId){
         let post = posts.find(p=>p.id==postId);
-        if(post){
-            let picturePath = path.resolve('uploads',userId,`${postId}${post.imageFileExtension}`);
-            let pictureExists = fs.existsSync(picturePath);
-            if(pictureExists){
-                return {accessible:true,message:"Picture found successfully",path:picturePath,code:200};
-            } else {
-                return {accessible:false,message:"Picture could not be found in the specified directory",path:null,code:404};
-            }
-        } else {
-            return {accessible:false,message:"Post does not exist",path:null,code:404};
+        if(!post){
+            return {success:false,message:"Post does not exist or inaccessible",path:null,code:404}
         }
+        let postIsAccessible = post.isDraft ? (post.userId === userId) : true ;
+        if(!postIsAccessible){
+            return {success:false,message:"Post does not exist or inaccessible",path:null,code:404} // NOTE the responses for both 'post does not exist' and 'post is inaccessible' cases are the same in order to avoid exposing the presece of a post that is inaccessible to the user
+        }
+        let imageFilePath = path.join(process.cwd(),'uploads',userId,postId+post.imageFileExtension);
+        let imageExists = fs.existsSync(imageFilePath)
+        if(!imageExists){
+            return {success:false,message:"Could not find the image",path:null,code:404}
+        }
+        return {success:true,message:"Picture retieved successfully",path:imageFilePath,code:200}
     }
     static delete(postId,userId) {
         let postIndex = posts.findIndex(p=>p.id == postId);
-        if(postIndex >= 0){
-            let userAuthorised = (posts[postIndex].userId == userId);
-            if(userAuthorised){
-                let deletedPostId = posts[postIndex].id; console.log(deletedPostId);
-                let imagePath = path.join(process.cwd(),'uploads',userId,`${postId}${posts[postIndex].imageFileExtension}`);
-                let imageFileExists = fs.existsSync(imagePath);
-                if(imageFileExists){
-                    fs.unlink(imagePath,(err)=>{
-                        if(err){
-                            console.error('Error deleting the image file');
-                        }
-                    });
-                }
-                posts.splice(postIndex,1);
-                return {success:true,deletedPostId,code:200,message:"Post deleted successfully"};
-            } else {
-                return {success:false,deletedPostId:null,code:403,message:"Unauthorized"};
-            }
-        } else {
+        // if(postIndex >= 0){
+        //     let userAuthorised = (posts[postIndex].userId == userId);
+        //     if(userAuthorised){
+        //         let deletedPostId = posts[postIndex].id; console.log(deletedPostId);
+        //         let imagePath = path.join(process.cwd(),'uploads',userId,`${postId}${posts[postIndex].imageFileExtension}`);
+        //         let imageFileExists = fs.existsSync(imagePath);
+        //         if(imageFileExists){
+        //             fs.unlink(imagePath,(err)=>{
+        //                 if(err){
+        //                     console.error('Error deleting the image file');
+        //                 }
+        //             });
+        //         }
+        //         posts.splice(postIndex,1);
+        //         return {success:true,deletedPostId,code:200,message:"Post deleted successfully"};
+        //     } else {
+        //         return {success:false,deletedPostId:null,code:403,message:"Unauthorized"};
+        //     }
+        // } else {
+        //     return {success:false,deletedPostId:null,code:404,message:"Post does not exist"};
+        // }
+        if(postIndex < 0){
             return {success:false,deletedPostId:null,code:404,message:"Post does not exist"};
         }
+        let userAuthorised = (posts[postIndex].userId == userId);
+        if(!userAuthorised){
+            return {success:false,deletedPostId:null,code:403,message:"Unauthorized"};
+        }
+        let deletedPostId = posts[postIndex].id;
+        let imagePath = path.join(process.cwd(),'uploads',userId,`${postId}${posts[postIndex].imageFileExtension}`);
+        let imageFileExists = fs.existsSync(imagePath);
+        if(imageFileExists){
+            fs.unlink(imagePath,(err)=>{
+                if(err){
+                    console.error('Error deleting the image file');
+                }
+            });
+        }
+        posts.splice(postIndex,1);
+        return {success:true,deletedPostId,code:200,message:"Post deleted successfully"};
     }
     static getfilteredPosts(query){
         if(!query || typeof query !== 'string'){
@@ -192,13 +213,16 @@ export default class Post {
         }
         let queryKeywords = query.trim().toLowerCase().replace(/[^a-zA-Z0-9\s]/g,'').split(/\s+/).filter(word=>!stopWords.includes(word)); //NOTE
         let queryKeywordsSet = new Set(queryKeywords); // NOTE
-        let matchingPosts = posts.filter(post=>
-            post.captionKeywords.some(c=>queryKeywordsSet.has(c)) // NOTE this is more efficient than using array's .includes() method due3 to how the data structures are designed
+        let matchingPosts = posts.filter(post=>{
+            let postIsAccessible = !post.isDraft && !post.isArchived;
+            let postIsRelevantToTheQuery = post.captionKeywords.some(c=>queryKeywordsSet.has(c)) // NOTE this is more efficient than using array's .includes() method due to how the data structures are designed
+            return postIsAccessible && postIsRelevantToTheQuery;
+        }
         );
         if(matchingPosts.length===0){
-            return {success:true,posts:[],message:"No matching posts found...",code:404}
+            return {success:true,posts:[],message:"No relevant posts found...",code:404}
         } else {
-            return {success:true,posts:matchingPosts,message:"Matching posts found",code:200}
+            return {success:true,posts:matchingPosts,message:"Search results fetched!",code:200}
         }
     }
     static getDrafts(userId){
@@ -223,10 +247,10 @@ export default class Post {
         let responseMessage = currentStatus ? 'Post has been unarchived' : 'Post has been archived';
         return {success:true,code:200,message:responseMessage}
     }
-    static searchFor(query,page,limit){
-        let keywords = query.toLowerCase().trim().replace(/[^a-z0-9\s]/g,'').split(/\s+/); // NOTE the first req-ex selects all everything that is not a lower case, not a digit and not a white space globally and, the second matches one or more whitespace characters (spaces, tabs, etc.)
-        let posts = new Set(posts.filter(p=>!p.isDraft&&!p.isArchived))
-    }
+    // static searchFor(query,page,limit){
+    //     let keywords = query.toLowerCase().trim().replace(/[^a-z0-9\s]/g,'').split(/\s+/); // NOTE the first req-ex selects all everything that is not a lower case, not a digit and not a white space globally and, the second matches one or more whitespace characters (spaces, tabs, etc.)
+    //     let posts = new Set(posts.filter(p=>!p.isDraft&&!p.isArchived))
+    // }
     static postDraft(userId,draftId){
         let index = posts.findIndex(p=>p.isDraft&&p.id===draftId&&p.userId===userId); //  three conditions are: 1. the post is a draft, 2. the post id matches the draft id, 3. the user id matches the user id of the user sending the request
         if(index < 0){

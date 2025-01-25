@@ -27,10 +27,27 @@ export default class UserController {
     }
     static handleLogin(req,res){
         let {email,password} = req.body;
+
+        let alreadyLoggedIn = false;
+        console.log(req.cookies.jwt);
+        if(req.cookies.jwt){  // the client would send a JWT token if someone had already logged in
+            let tokenPayload = jwt.verify(req.cookies.jwt,'3f4b9c7a5d8e1f4a7c2e8d9f1b6c3a4e');
+            alreadyLoggedIn = (tokenPayload.email === email);
+        }
+        if(alreadyLoggedIn){
+            return res.status(200).json({success:true,message:"User is already logged in",userId:null,token:null});
+        }
+
         let confirmLogin = User.confirmLogin(email,password);
         if(confirmLogin.success){
             let tokenSecret = '3f4b9c7a5d8e1f4a7c2e8d9f1b6c3a4e';
-            let token = jwt.sign({name:confirmLogin.user.name,email:confirmLogin.user.email,userId:confirmLogin.user.id},tokenSecret,{ expiresIn: "1h"});
+            let token = jwt.sign({
+                name:confirmLogin.user.name,
+                email:confirmLogin.user.email,
+                userId:confirmLogin.user.id},
+                tokenSecret,
+                { expiresIn: "1h"}
+                );
             return res.status(200).cookie('authentication',token,{maxAge: 1000*60*60}).json({success:true,message:'Login Successful',userID:confirmLogin.user.id,token});
         } else {
             throw new ApplicationError(401,confirmLogin.message); 

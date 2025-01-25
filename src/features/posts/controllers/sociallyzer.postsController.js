@@ -21,7 +21,8 @@ export default class PostController {
     }
     getSpecificPost(req,res){
         let postId = req.params.id;
-        let post = PostsModel.getById(postId);
+        let userId = req.tokenPayload.userID;
+        let post = PostsModel.getById(postId,userId);
         if(post.found){
             return res.status(post.code).json({success:true,post:post.details});
         } else {
@@ -72,7 +73,7 @@ export default class PostController {
         let userId = req.params.userId;
         let postId = req.params.postId;
         let picture = PostsModel.getPicture(userId,postId);
-        if(picture.accessible){
+        if(picture.success){
             res.status(picture.code).sendFile(picture.path);  // NOTE this: this is an asynchronous method
         } else {
             res.status(picture.code).sendFile(path.join(process.cwd(),'uploads','Error.jpg'));
@@ -112,10 +113,10 @@ export default class PostController {
             return res.status(response.code).json({success:response.success,message:response.message})
         }
     }
-    searchPosts(req,res){
-        let {query,page,limit} = req.query;
-        let response = PostsModel.searchFor(query,page,limit);
-    }
+    // searchPosts(req,res){
+    //     let {query,page,limit} = req.query;
+    //     let response = PostsModel.searchFor(query,page,limit);
+    // }
     postDraft(req,res){
         let draftId = req.params.id;
         let userId = req.tokenPayload.userId;
