@@ -35,7 +35,7 @@ export default class UserController {
             alreadyLoggedIn = (tokenPayload.email === email);
         }
         if(alreadyLoggedIn){
-            return res.status(200).json({success:true,message:"User is already logged in",userId:null,token:null});
+            return res.status(200).json({success:true,message:"Already Logged In",userId:null,token:null});
         }
 
         let confirmLogin = User.confirmLogin(email,password);
@@ -53,7 +53,19 @@ export default class UserController {
             throw new ApplicationError(401,confirmLogin.message); 
         }
     }
-
+    static logout(req,res){
+        let token = req.cookies.jwt;
+        if(!token){
+            return res.status(400).json({message:"Token is missing.",success:false});
+        }
+        let payload = jwt.verify(token,'3f4b9c7a5d8e1f4a7c2e8d9f1b6c3a4e');
+        let response = User.logout(payload.userId);
+        if(response.success){
+            return res.status(response.code).clearCookie('jwt').json({message:response.message,success:response.success}) // clears the jwt token
+        } else {
+            return res.status(response.code).json({message:response.message,success:response.success})
+        }
+    }
     //instance methods
     
 }

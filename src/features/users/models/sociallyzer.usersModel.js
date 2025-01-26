@@ -42,6 +42,14 @@ export class User {
             return {success:false,message:`Invalid Credentials`};
         }
     }
+    static logout(userId){
+        let userIndex = users.findIndex(u=>u.id===userId);
+        if(userIndex < 0){
+            return {code:200,success:true,message:"Already Logged Out or User Does Not Exist"}
+        }
+        users.splice(userIndex,1)
+        return {code:200,success:true,message:"Log Out Successful"}    // no error handling is done here specifically. In case any error occurs, it will be caught in the error handler middleware
+    }
     //instance methods
     
 }

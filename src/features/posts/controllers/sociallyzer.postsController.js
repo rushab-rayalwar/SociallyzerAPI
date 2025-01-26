@@ -90,9 +90,9 @@ export default class PostController {
         }
     }
     
-    getFilteredPosts(req,res){
-        let query = req.query.filter;
-        let filteredPosts = PostsModel.getfilteredPosts(query);
+    search(req,res){
+        let query = req.query.query;
+        let filteredPosts = PostsModel.search(query);
         if(!filteredPosts.success){
             throw new ApplicationError(filteredPosts.code,filteredPosts.message);
         }

@@ -140,14 +140,6 @@ export default class Post {
         posts.push(post);
         return {added:true, details:post, code:200};
     }
-    // static getPost(userId,postId) {
-    //     let post = posts.find(p=>p.id == postId && p.userId == userId);
-    //     if(!!post){
-    //         return {exists:true,message:null,details:post,code:200}
-    //     } else {
-    //         return {exists:false,message:'Post by user does not exist',details:null,code:404};
-    //     }
-    // }
     static getPicture(userId,postId){
         let post = posts.find(p=>p.id==postId);
         if(!post){
@@ -166,27 +158,6 @@ export default class Post {
     }
     static delete(postId,userId) {
         let postIndex = posts.findIndex(p=>p.id == postId);
-        // if(postIndex >= 0){
-        //     let userAuthorised = (posts[postIndex].userId == userId);
-        //     if(userAuthorised){
-        //         let deletedPostId = posts[postIndex].id; console.log(deletedPostId);
-        //         let imagePath = path.join(process.cwd(),'uploads',userId,`${postId}${posts[postIndex].imageFileExtension}`);
-        //         let imageFileExists = fs.existsSync(imagePath);
-        //         if(imageFileExists){
-        //             fs.unlink(imagePath,(err)=>{
-        //                 if(err){
-        //                     console.error('Error deleting the image file');
-        //                 }
-        //             });
-        //         }
-        //         posts.splice(postIndex,1);
-        //         return {success:true,deletedPostId,code:200,message:"Post deleted successfully"};
-        //     } else {
-        //         return {success:false,deletedPostId:null,code:403,message:"Unauthorized"};
-        //     }
-        // } else {
-        //     return {success:false,deletedPostId:null,code:404,message:"Post does not exist"};
-        // }
         if(postIndex < 0){
             return {success:false,deletedPostId:null,code:404,message:"Post does not exist"};
         }
@@ -207,7 +178,7 @@ export default class Post {
         posts.splice(postIndex,1);
         return {success:true,deletedPostId,code:200,message:"Post deleted successfully"};
     }
-    static getfilteredPosts(query){
+    static search(query){ console.log(query,"- this is the query, its type -",typeof query);
         if(!query || typeof query !== 'string'){
             return{success:false,posts:[],message:"Search query is invalid",code:400}
         }
@@ -247,10 +218,6 @@ export default class Post {
         let responseMessage = currentStatus ? 'Post has been unarchived' : 'Post has been archived';
         return {success:true,code:200,message:responseMessage}
     }
-    // static searchFor(query,page,limit){
-    //     let keywords = query.toLowerCase().trim().replace(/[^a-z0-9\s]/g,'').split(/\s+/); // NOTE the first req-ex selects all everything that is not a lower case, not a digit and not a white space globally and, the second matches one or more whitespace characters (spaces, tabs, etc.)
-    //     let posts = new Set(posts.filter(p=>!p.isDraft&&!p.isArchived))
-    // }
     static postDraft(userId,draftId){
         let index = posts.findIndex(p=>p.isDraft&&p.id===draftId&&p.userId===userId); //  three conditions are: 1. the post is a draft, 2. the post id matches the draft id, 3. the user id matches the user id of the user sending the request
         if(index < 0){

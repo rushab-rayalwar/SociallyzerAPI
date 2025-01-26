@@ -12,7 +12,7 @@ let postsController = new PostsController(); // Make instance of the controller
 let postsRouter = express.Router();
 
 // GET Routes
-postsRouter.get('/search', (req, res) => postsController.searchPosts(req, res)); // Search posts
+postsRouter.get('/search', (req, res) => postsController.search(req, res)); // Search posts
 postsRouter.get('/filter', (req, res) => postsController.getFilteredPosts(req, res)); // Filtered posts
 postsRouter.get('/all', (req, res) => postsController.getAll(req, res)); // Fetch all posts
 postsRouter.get('/drafts', (req, res) => postsController.getDrafts(req, res)); // Fetch draft posts
