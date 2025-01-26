@@ -30,7 +30,7 @@ export default class CommentsController {
         }
     }
     static deleteComment(req,res){
-        let commentId = req.params.postId;
+        let commentId = req.params.id;
         let userId = req.tokenPayload.userId;
         let deleteCommentResponse = CommentsModel.deleteComment(commentId,userId);
         if(deleteCommentResponse.success){

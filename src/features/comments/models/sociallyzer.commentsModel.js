@@ -20,7 +20,7 @@ export default class Comment {
 
     //static methods
     static getCommentsFor(postId){
-        let postIdIsValid = posts.some(p=>p.id===postId);
+        let postIdIsValid = posts.some(p=>p.id===postId && !p.isDraft && !p.isArchived);
         if(!postIdIsValid){
             return {success:false,message:"Post ID is invalid.",code:400,data:[]};
         }
@@ -32,7 +32,7 @@ export default class Comment {
         }
     }
     static addComment(postId,userId,content){
-        let postIndexInThePostsArray = posts.findIndex(p=>p.id===postId);  // no additional validation for userId is required as it is extracted from the JWT token in the authenticator middleware
+        let postIndexInThePostsArray = posts.findIndex(p=>p.id===postId && !p.isDraft && !p.isArchived);  // no additional validation for userId is required as it is extracted from the JWT token in the authenticator middleware
         if(postIndexInThePostsArray < 0){ // postid is invalid
             return {success:false,code:404,message:"Post ID is invalid.",data:[]};
         }
@@ -43,12 +43,12 @@ export default class Comment {
     }
     static deleteComment(commentId,userId){
         let commentIndexInCommentsArray = comments.findIndex(c=>c.id===commentId);
-        if(commentIndexInCommentsArray<0){ // comment id is in-valid. The userId is validated and extracted by the JWT middleware, so no need to validate again here.
-            return {success:false,code:404,message:"Comment ID does not exist."};
+        let postId = comments[commentIndexInCommentsArray].postedForPostId; 
+        let postIndexInPostsArray = posts.findIndex(p=>p.id===postId && !p.isDraft && !p.isArchived);
+        if(commentIndexInCommentsArray<0 || postIndexInPostsArray<0){ // comment id is in-valid. The userId is validated and extracted by the JWT middleware, so no need to validate again here.
+            return {success:false,code:404,message:"Comment does not exist or post is inaccessible."};
         }
         let userIdWhoCommented = comments[commentIndexInCommentsArray].postedByUserId;
-        let postId = comments[commentIndexInCommentsArray].postedForPostId; 
-        let postIndexInPostsArray = posts.findIndex(p=>p.id===postId);
         let userWhoPostedTheComment = posts[postIndexInPostsArray].userId;
         // Only the user who posted the post and the user who commented on the post are authorized to delete the comment
 
@@ -64,7 +64,7 @@ export default class Comment {
         if(commentIndexInCommentsArray<0){ // commentId is invalid
             return {success:false,code:404,message:"Could not find comment"};
         }
-        let userIdIsAuthorized = (comments[commentIndexInCommentsArray].postedByUserId === userId) ? true : false;
+        let userIdIsAuthorized = comments[commentIndexInCommentsArray].postedByUserId === userId;
         if(!userIdIsAuthorized){
             return {success:false,code:403,message:"User is unauthorized to update this comment",data:{}};
         } else {

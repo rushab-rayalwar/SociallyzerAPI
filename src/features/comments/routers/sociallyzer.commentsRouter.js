@@ -10,7 +10,7 @@ let commentsRouter = express.Router();
 
 commentsRouter.get('/:id',CommentsController.getCommentsForPost);
 commentsRouter.post('/:id',CommentsController.addComment);
-commentsRouter.delete('/:id',CommentsController.deleteComment);
 commentsRouter.put('/:id',CommentsController.updateComment);
+commentsRouter.delete('/:id',CommentsController.deleteComment);
 
 export default commentsRouter;

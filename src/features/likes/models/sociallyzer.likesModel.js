@@ -17,7 +17,7 @@ export default class Like {
     }
     //static methods
     static toggleLike(postId,userId){
-        let postIndexInPostsArray = posts.findIndex(p=>p.id===postId);
+        let postIndexInPostsArray = posts.findIndex(p=>p.id===postId && !p.isDraft && !p.isArchived);
         let userIndexInUsersArray = users.findIndex(u=>u.id===userId); // this is always valid because the userId id extracted from the token
         if(postIndexInPostsArray < 0){
             return {code:404,message:"Could not find the post",success:false};
@@ -48,7 +48,7 @@ export default class Like {
     }
     static getLikes(postId){
         let likeIndex = likes.findIndex(l=>l.postId===postId);
-        let postIndex = posts.findIndex(p=>p.id === postId);
+        let postIndex = posts.findIndex(p=>p.id === postId && !p.isDraft && !p.isArchived);
         if(postIndex>=0){ // postId is valid
             if(likeIndex>=0){
                 let userIds = likes[likeIndex].likedBy;
