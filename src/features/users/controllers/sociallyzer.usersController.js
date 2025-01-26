@@ -29,13 +29,12 @@ export default class UserController {
         let {email,password} = req.body;
 
         let alreadyLoggedIn = false;
-        console.log(req.cookies.jwt);
-        if(req.cookies.jwt){  // the client would send a JWT token if someone had already logged in
+        if(req.cookies.jwt){  // the client would send a JWT (token) if someone had already logged in
             let tokenPayload = jwt.verify(req.cookies.jwt,'3f4b9c7a5d8e1f4a7c2e8d9f1b6c3a4e');
             alreadyLoggedIn = (tokenPayload.email === email);
         }
         if(alreadyLoggedIn){
-            return res.status(200).json({success:true,message:"Already Logged In",userId:null,token:null});
+            return res.status(200).json({success:true,message:"User already logged in. Please log out before logging into a different account.",userId:null,token:null});
         }
 
         let confirmLogin = User.confirmLogin(email,password);

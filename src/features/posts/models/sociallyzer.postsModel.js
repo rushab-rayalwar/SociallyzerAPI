@@ -81,7 +81,7 @@ export function generateUniquePostId() {
 }
 
 export default class Post {
-    constructor(userId,postId,caption,imageFileExtension,draft = false) {
+    constructor(userId,postId,caption,imageFileExtension,draft = false) {   
         this.userId = userId;
         this.caption = caption;
         this.id = postId;

@@ -17,9 +17,10 @@ export class User {
     constructor(name,email,password){
         this.name = name;
         this.email = email;
-        if(password){
-            this.password = bcrypt.hashSync(password,5); // async version of this method with a higher salt round number can be used in Production Environment
-        }
+        // if(password){
+        //     this.password = bcrypt.hashSync(password,5); // async version of this method with a higher salt round number can be used in Production Environment
+        // }
+        this.password = bcrypt.hashSync(password,5); // async version of this method with a higher salt round number can be used in Production Environment
         this.id = crypto.randomBytes(16).toString('hex');
         this.likedPosts=[]
     }
