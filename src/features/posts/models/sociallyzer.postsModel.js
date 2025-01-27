@@ -83,6 +83,7 @@ export function generateUniquePostId() {
 export default class Post {
     constructor(userId,postId,caption,imageFileExtension,draft = false) {   
         this.userId = userId;
+        this.userName = users.find(u=>u.id === userId).name; // adding this property allows displaying posts along with the user's name who posted them, at the client side / front end
         this.caption = caption;
         this.id = postId;
         this.pictureUrl = `/api/posts/pics/${userId}/${postId}`; // NOTE this
@@ -129,7 +130,7 @@ export default class Post {
         if(!userExists){
             return {success:false,message:"Could not find the user.",code:404,data:[]};
         }
-        let postsByUser = posts.filter(post=>post.userId===userId && !p.isDraft && !p.isArchived);
+        let postsByUser = posts.filter(post=>post.userId===userId && !post.isDraft && !post.isArchived);
         if(postsByUser.length==0){
             return {success:true,message:'No posts posted by the user.',code:200,data:[]};
         }
@@ -178,7 +179,7 @@ export default class Post {
         posts.splice(postIndex,1);
         return {success:true,deletedPostId,code:200,message:"Post deleted successfully"};
     }
-    static search(query){ console.log(query,"- this is the query, its type -",typeof query);
+    static search(query){
         if(!query || typeof query !== 'string'){
             return{success:false,posts:[],message:"Search query is invalid",code:400}
         }
@@ -205,7 +206,7 @@ export default class Post {
         return {success:true,code:200,message:"Draft posts fetched successfully", data:draftPosts};
     }
     static toggleArchive(userId,postId){
-        let index = posts.findIndex(p=>p.id===postId);
+        let index = posts.findIndex(p=>p.id===postId && !p.isDraft);
         if(index<0){
             return {success:false,code:404,message:"Post does not exist"}
         }

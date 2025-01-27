@@ -14,7 +14,7 @@ export default class Comment {
         this.postedByUserId = userId;
         this.postedForPostId = postId;
         this.content = content;
-        this.id = 'COMMENT-'+Date.now()+crypto.randomBytes(16).toString(hex);
+        this.id = 'COMMENT-'+Date.now()+crypto.randomBytes(16).toString('hex');
         this.timeStamp = Date.now(); // the timestamp is in milliseconds so that it can be formatted as desired at the client side
     }
 
@@ -32,6 +32,9 @@ export default class Comment {
         }
     }
     static addComment(postId,userId,content){
+        if(content == '' || content == undefined){
+            return {success:false,code:400,message:"Content field in request body is missing"};
+        }
         let postIndexInThePostsArray = posts.findIndex(p=>p.id===postId && !p.isDraft && !p.isArchived);  // no additional validation for userId is required as it is extracted from the JWT token in the authenticator middleware
         if(postIndexInThePostsArray < 0){ // postid is invalid
             return {success:false,code:404,message:"Post ID is invalid.",data:[]};

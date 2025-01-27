@@ -13,7 +13,7 @@ export default class CommentsController {
         let postId = req.params.id;
         let comments = CommentsModel.getCommentsFor(postId);
         if(comments.success){
-            return res.status(comments.code).json({success:true,message:comments.message,data:comments.commentsArray});
+            return res.status(comments.code).json({success:true,message:comments.message,data:comments.data});
         } else {
             throw new ApplicationError(comments.code,comments.message);
         }

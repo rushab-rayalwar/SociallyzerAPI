@@ -15,7 +15,6 @@ export default class Like {
         console.log(user,"-user");
         this.likedBy = [{userName:user.name,userId:user.id}]
     }
-    //static methods
     static toggleLike(postId,userId){
         let postIndexInPostsArray = posts.findIndex(p=>p.id===postId && !p.isDraft && !p.isArchived);
         let userIndexInUsersArray = users.findIndex(u=>u.id===userId); // this is always valid because the userId id extracted from the token
@@ -61,6 +60,22 @@ export default class Like {
             return {likedBy:null,code:400,message:"Post ID is invalid",numberOfLikes:null,success:false};
         }
     }
-
-    //instance methods
+    static getLikedPostsForUser(userIdSendingTheRequets,userId){
+        let userIndex = users.findIndex(u=>u.id===userId);
+        if(userIndex < 0){
+            return {code:400,message:"Invalid User ID",success:false};
+        }
+        if(userIdSendingTheRequets !== userId){
+            return {code:401,message:"Unauthorized",success:false};
+        }
+        let likedPosts = users[userIndex].likedPosts;
+        let likedPostsData = [];
+        likedPosts.forEach(postId=>{
+            let postIndex = posts.findIndex(p=>p.id===postId && !p.isDraft && !p.isArchived);
+            if(postIndex>=0){
+                likedPostsData.push(posts[postIndex]);
+            }
+        });
+        return {code:200,message:"Successfully fetched the liked posts",data:likedPostsData,success:true};
+    }
 }

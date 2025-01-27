@@ -12,13 +12,20 @@ export let users = [{
     password:"123", 
     id:"defaultUser",
     likedPosts:[]
+},
+{ // delete from here
+    name: 'RUSHAB RAYALWAR',
+    email: 'rushabrayalwar@gmail.com',
+    password: '$2b$05$HAe5vcyfvHz/Z31Tk8utvuXrUTwdCQdvpzS2KzwYGo76rFH/Mjrzm',
+    id: 'USER-b1655b6bda27173bcf75600bb5cecc1c',
+    likedPosts: []
 }];
 export class User {
     constructor(name,email,password){
         this.name = name;
         this.email = email;
         this.password = bcrypt.hashSync(password,5); // async version of this method with a higher salt round number can be used in Production Environment
-        this.id = 'USER='+crypto.randomBytes(16).toString('hex');
+        this.id = 'USER-'+crypto.randomBytes(16).toString('hex');
         this.likedPosts=[]
     }
      
@@ -26,7 +33,7 @@ export class User {
     static addUser(name,email,password){
         if(name && email && password){
             let user = new User(name,email,password);
-            users.push(user);
+            users.push(user); console.log("USERS",users);
             return {success:true,user};
         } else {
             throw new ApplicationError
@@ -45,7 +52,6 @@ export class User {
         if(userIndex < 0){
             return {code:200,success:true,message:"Already Logged Out or User Does Not Exist"}
         }
-        users.splice(userIndex,1)
         return {code:200,success:true,message:"Log Out Successful"}    // no error handling is done here specifically. In case any error occurs, it will be caught in the error handler middleware
     }
     //instance methods

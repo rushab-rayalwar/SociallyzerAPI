@@ -26,4 +26,14 @@ export default class LikesController {
             throw new ApplicationError(likes.code,likes.message);
         }
     }
+    static getLikedPostsForUser(req,res){
+        let userIdSendingTheRequest = req.tokenPayload.userId;
+        let userId = req.params.userId;
+        let response = LikesModel.getLikedPostsForUser(userIdSendingTheRequest,userId);
+        if(response.success){
+            return res.status(response.code).json({success:true,message:response.message,data:response.data});
+        } else {
+            throw new ApplicationError(response.code,response.message);
+        }
+    }
 }
