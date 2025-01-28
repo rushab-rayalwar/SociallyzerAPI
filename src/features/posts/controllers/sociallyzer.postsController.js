@@ -91,8 +91,12 @@ export default class PostController {
     }
     
     search(req,res){
-        let query = req.query.query;
-        let filteredPosts = PostsModel.search(query);
+        let query = req.query.query; // search query
+
+        let pageNumber = req.query.page; // parameters for pagination
+        let limit = req.query.limit
+
+        let filteredPosts = PostsModel.search(query,pageNumber,limit);
         if(!filteredPosts.success){
             throw new ApplicationError(filteredPosts.code,filteredPosts.message);
         }

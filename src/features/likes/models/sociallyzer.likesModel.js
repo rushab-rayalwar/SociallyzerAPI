@@ -60,15 +60,15 @@ export default class Like {
             return {likedBy:null,code:400,message:"Post ID is invalid",numberOfLikes:null,success:false};
         }
     }
-    static getLikedPostsForUser(userIdSendingTheRequets,userId){
+    static getLikedPostsForUser(userId){
         let userIndex = users.findIndex(u=>u.id===userId);
         if(userIndex < 0){
             return {code:400,message:"Invalid User ID",success:false};
         }
-        if(userIdSendingTheRequets !== userId){
-            return {code:401,message:"Unauthorized",success:false};
-        }
         let likedPosts = users[userIndex].likedPosts;
+        if(likedPosts.length===0){
+            return {code:200,message:"No posts liked",data:[],success:true};
+        }
         let likedPostsData = [];
         likedPosts.forEach(postId=>{
             let postIndex = posts.findIndex(p=>p.id===postId && !p.isDraft && !p.isArchived);

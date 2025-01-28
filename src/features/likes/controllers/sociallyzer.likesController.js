@@ -27,9 +27,8 @@ export default class LikesController {
         }
     }
     static getLikedPostsForUser(req,res){
-        let userIdSendingTheRequest = req.tokenPayload.userId;
-        let userId = req.params.userId;
-        let response = LikesModel.getLikedPostsForUser(userIdSendingTheRequest,userId);
+        let userId = req.tokenPayload.userId;
+        let response = LikesModel.getLikedPostsForUser(userId);
         if(response.success){
             return res.status(response.code).json({success:true,message:response.message,data:response.data});
         } else {

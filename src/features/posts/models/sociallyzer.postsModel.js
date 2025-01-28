@@ -179,7 +179,7 @@ export default class Post {
         posts.splice(postIndex,1);
         return {success:true,deletedPostId,code:200,message:"Post deleted successfully"};
     }
-    static search(query){
+    static search(query,pageNumber = 1, limit = Infinity){
         if(!query || typeof query !== 'string'){
             return{success:false,posts:[],message:"Search query is invalid",code:400}
         }
@@ -193,9 +193,13 @@ export default class Post {
         );
         if(matchingPosts.length===0){
             return {success:true,posts:[],message:"No relevant posts found...",code:404}
-        } else {
-            return {success:true,posts:matchingPosts,message:"Search results fetched!",code:200}
         }
+
+        if(limit != infinity){
+            let lowerIndex = (pageNumber - 1) * limit;
+            let upperIndex = 
+        }
+        return {success:true,posts:matchingPosts,message:"Search results fetched!",code:200}
     }
     static getDrafts(userId){
         // userId is extracted from the JWT token. Hence no additional verification is needed

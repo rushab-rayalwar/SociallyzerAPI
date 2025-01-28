@@ -12,13 +12,6 @@ export let users = [{
     password:"123", 
     id:"defaultUser",
     likedPosts:[]
-},
-{ // delete from here
-    name: 'RUSHAB RAYALWAR',
-    email: 'rushabrayalwar@gmail.com',
-    password: '$2b$05$HAe5vcyfvHz/Z31Tk8utvuXrUTwdCQdvpzS2KzwYGo76rFH/Mjrzm',
-    id: 'USER-b1655b6bda27173bcf75600bb5cecc1c',
-    likedPosts: []
 }];
 export class User {
     constructor(name,email,password){

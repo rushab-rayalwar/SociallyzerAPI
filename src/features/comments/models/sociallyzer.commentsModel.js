@@ -65,9 +65,14 @@ export default class Comment {
     static updateComment(commentId,userId,content){
         let commentIndexInCommentsArray = comments.findIndex(c=>c.id===commentId);
         if(commentIndexInCommentsArray<0){ // commentId is invalid
-            return {success:false,code:404,message:"Could not find comment"};
+            return {success:false,code:404,message:"Could not find the comment"};
         }
-        let userIdIsAuthorized = comments[commentIndexInCommentsArray].postedByUserId === userId;
+        let postId = comments[commentIndexInCommentsArray].postedForPostId;
+        let postIndexInPostsArray = posts.findIndex(p=>p.id===postId && !p.isDraft && !p.isArchived);
+        if(postIndexInPostsArray<0){ // post is inaccessible
+            return {success:false,code:404,message:"Could not find the comment"};
+        }
+        let userIdIsAuthorized = ( comments[commentIndexInCommentsArray].postedByUserId === userId );
         if(!userIdIsAuthorized){
             return {success:false,code:403,message:"User is unauthorized to update this comment",data:{}};
         } else {
