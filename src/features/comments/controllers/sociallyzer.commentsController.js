@@ -11,7 +11,11 @@ export default class CommentsController {
     //static methods
     static getCommentsForPost(req,res){
         let postId = req.params.id;
-        let comments = CommentsModel.getCommentsFor(postId);
+
+        let limit = req.query.limit; // pagination parameters
+        let page = req.query.page;
+
+        let comments = CommentsModel.getCommentsFor(postId,limit,page);
         if(comments.success){
             return res.status(comments.code).json({success:true,message:comments.message,data:comments.data});
         } else {

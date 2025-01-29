@@ -10,7 +10,7 @@ export default function userAuthenticator (req,res,next) {
     let token = req.cookies.jwt;
     if(token){
         try{
-            let payload = jwt.verify(token, '3f4b9c7a5d8e1f4a7c2e8d9f1b6c3a4e');
+            let payload = jwt.verify(token, process.env.JWT_SECRET);
             req.tokenPayload = payload;
             next();
         } catch(err) {

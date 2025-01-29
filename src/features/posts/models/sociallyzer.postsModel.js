@@ -8,7 +8,7 @@ import {users} from '../../users/models/sociallyzer.usersModel.js';
 
 //custom modules
 
-let commentWeight = 4, likeWeight = 1; // these weights are used in the logic for sorting posts in the descending order of engagement
+let commentWeight = process.env.COMMENT_WEIGHT, likeWeight = process.env.LIKE_WEIGHT; // these weights are used in the logic for sorting posts in the descending order of engagement
 
 let stopWords = [
     "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "has", "he", 
@@ -99,9 +99,32 @@ export default class Post {
         this.isArchived = false;
     }
     //static methods
-    static getAll(){
+    static getAll(limit = Infinity ,page = 1 ,sort = false){
         let allPosts = posts.filter(p=>!p.isDraft&&!p.isArchived);
-        return {posts:allPosts};
+        //sorting logic
+        let resultPosts = [...allPosts]; // this is to ensure that the original array remains unmodified
+        if(sort){
+            resultPosts.sort((a,b)=>{
+                let aScore = (a.comments * commentWeight) + (a.likes * likeWeight);
+                let bScore = (b.comments * commentWeight) + (b.likes * likeWeight);
+                return (bScore - aScore);
+            })
+        }
+        //pagination logic
+        let totalPages = 1;
+        if(limit != Infinity){ 
+            if(limit < 1){
+                return {data:null,success:false,code:400,message:"Limit parameter cannot be less than 1"}
+            }
+            totalPages = Math.ceil(resultPosts.length / limit) ;
+            if(page > totalPages || page < 1) {
+                return {data:null,success:false,code:400,message:"Invalid parameters for pagination"}
+            }
+            let lowerIndex = limit * (page-1);
+            let upperIndex = lowerIndex + limit;
+            resultPosts = resultPosts.slice(lowerIndex,upperIndex);
+        }
+        return {data:{posts:resultPosts,page,totalPages},success:true,code:200,message:"Posts retrieved successfully"};
     }
     static getById(postId,userId){
         let post = posts.find(p=>{
@@ -115,13 +138,36 @@ export default class Post {
             return {found:false, details:null, code:404, message:"Post not found or access deined"};
         }
     }
-    static getForUser(userID){         // for posts posted by the user sending the request
+    static getForUser(userID,limit=Infinity,page=1,sort=false){         // for posts posted by the user sending the request
         let postsForUser = posts.filter(p=>p.userId === userID && !p.isDraft && !p.isArchived);
-        if(postsForUser.length > 0){
-            return {found:true, details:postsForUser,code:200,message:"Posts retrieved successfully"}
-        } else {
+        if(postsForUser.length < 1 ){
             return {found:false, details:null,code:200,message:'Nothing posted yet!'}
         }
+        //sorting logic
+        let resultPosts = [...postsForUser]; // this is to ensure that the original array remains unmodified
+        if(sort){
+            resultPosts.sort((a,b)=>{
+                let aScore = (a.comments * commentWeight) + (a.likes * likeWeight);
+                let bScore = (b.comments * commentWeight) + (b.likes * likeWeight);
+                return (bScore - aScore);
+            })
+        }
+        //pagination logic
+        let totalPages = 1;
+        if(limit != Infinity){ 
+            if(limit < 1){
+                return {data:null,found:false,code:400,message:"Limit parameter cannot be less than 1"}
+            }
+            totalPages = Math.ceil(resultPosts.length / limit) ;
+            if(page > totalPages || page < 1) {
+                return {data:null,found:false,code:400,message:"Invalid parameters for pagination"}
+            }
+            let lowerIndex = limit * (page-1);
+            let upperIndex = lowerIndex + limit;
+            resultPosts = resultPosts.slice(lowerIndex,upperIndex);
+        }
+
+        return {found:true, data:{posts:resultPosts,page,totalPages},code:200,message:"Posts retrieved successfully"}
     }
     static getPostsForUserId(userId){       // for any other user's posts
         let userExists = users.some(u=>{
@@ -136,7 +182,31 @@ export default class Post {
         if(postsByUser.length==0){
             return {success:true,message:'No posts posted by the user.',code:200,data:[]};
         }
-        return {success:true,message:"Posts retrieved successfully",code:200,data:postsByUser}
+
+        let resultPosts = [...postsForUser]; // this is to ensure that the original array remains unmodified
+        if(sort){
+            resultPosts.sort((a,b)=>{
+                let aScore = (a.comments * commentWeight) + (a.likes * likeWeight);
+                let bScore = (b.comments * commentWeight) + (b.likes * likeWeight);
+                return (bScore - aScore);
+            })
+        }
+        //pagination logic
+        let totalPages = 1;
+        if(limit != Infinity){ 
+            if(limit < 1){
+                return {data:null,success:false,code:400,message:"Limit parameter cannot be less than 1"}
+            }
+            totalPages = Math.ceil(resultPosts.length / limit) ;
+            if(page > totalPages || page < 1) {
+                return {data:null,success:false,code:400,message:"Invalid parameters for pagination"}
+            }
+            let lowerIndex = limit * (page-1);
+            let upperIndex = lowerIndex + limit;
+            resultPosts = resultPosts.slice(lowerIndex,upperIndex);
+        }
+
+        return {success:true,message:"Posts retrieved successfully",code:200,data:{posts:resultPosts,page,totalPages}}
     }
     static add(userId,postId,caption,imageFileExtension,isDraft){
         let post = new Post(userId,postId,caption,imageFileExtension,isDraft);

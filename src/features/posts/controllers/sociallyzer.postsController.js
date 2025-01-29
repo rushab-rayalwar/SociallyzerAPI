@@ -12,9 +12,17 @@ export default class PostController {
 
     //instance methods
     getAll(req,res){
-        let response = PostsModel.getAll();
-        if(response.posts.length > 0){
-            return res.status(200).json({success:true,posts:response.posts});
+        let limit = req.query.limit; // pagination parameters
+        let page = req.query.page;
+
+        let sort = !!req.query.sort; // parameter to fetch posts in the descending order of engagement
+
+        let response = PostsModel.getAll(limit,page,sort);
+        if(!response.success) {
+            new ApplicationError(response.code,response.message)
+        }
+        if(response.data.posts.length > 0){
+            return res.status(200).json({success:true,data:response.data});
         } else {
             new ApplicationError(404,'Nothing posted yet!');
         }
@@ -33,9 +41,9 @@ export default class PostController {
         let userID = req.tokenPayload.userId;
         let posts = PostsModel.getForUser(userID);
         if(posts.found){
-            return res.status(posts.code).json({success:true,posts:posts.details,message:posts.message})
+            return res.status(posts.code).json({success:true,data:response.data,message:posts.message})
         } else {
-            return res.status(posts.code).json({success:true,posts:[],message:posts.message});
+            return res.status(posts.code).json({success:true,data:response.data,message:posts.message});
         }
     }
     getPostsForUserId(req,res){

@@ -19,7 +19,7 @@ export default class Comment {
     }
 
     //static methods
-    static getCommentsFor(postId){
+    static getCommentsFor(postId, limit = Infinity, page = 1){
         let postIdIsValid = posts.some(p=>p.id===postId && !p.isDraft && !p.isArchived);
         if(!postIdIsValid){
             return {success:false,message:"Post ID is invalid.",code:400,data:[]};
@@ -27,9 +27,26 @@ export default class Comment {
         let commentsForPost = comments.filter(c=>c.postedForPostId===postId);
         if(commentsForPost.length === 0 ){ // no comments found for the post in the comments array
             return {success:true,code:200,message:"No comments found for the specified post.",data:[]};
-        } else {
-            return {success:true,code:200,message:"Comments fetched successfully.",data:commentsForPost};
         }
+
+        let resultComments = [...commentsForPost];
+        
+        //pagination logic
+        let totalPages = 1;
+        if(limit != Infinity){ 
+            if(limit < 1){
+                return {data:null,success:false,code:400,message:"Limit parameter cannot be less than 1"}
+            }
+            totalPages = Math.ceil(resultComments.length / limit) ;
+            if(page > totalPages || page < 1) {
+                return {data:null,success:false,code:400,message:"Invalid parameters for pagination"}
+            }
+            let lowerIndex = limit * (page-1);
+            let upperIndex = lowerIndex + limit;
+            resultComments = resultComments.slice(lowerIndex,upperIndex);
+        }
+
+        return {success:true,code:200,message:"Comments fetched successfully.",data:{comments:resultComments,page,totalPages}};
     }
     static addComment(postId,userId,content){
         if(content == '' || content == undefined){

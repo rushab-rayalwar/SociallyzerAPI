@@ -1,6 +1,7 @@
 //core modules
 
 //third-party modules
+import './dotenvConfig.js';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import swagger from 'swagger-ui-express';
