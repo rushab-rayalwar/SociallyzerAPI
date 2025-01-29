@@ -100,7 +100,7 @@ export default class PostController {
         if(!filteredPosts.success){
             throw new ApplicationError(filteredPosts.code,filteredPosts.message);
         }
-        return res.status(filteredPosts.code).json({success:filteredPosts.success,message:filteredPosts.message,data:filteredPosts.posts});
+        return res.status(filteredPosts.code).json({success:filteredPosts.success,message:filteredPosts.message,data:filteredPosts.data});
     }
     getDrafts(req,res){
         let userId = req.tokenPayload.userId;

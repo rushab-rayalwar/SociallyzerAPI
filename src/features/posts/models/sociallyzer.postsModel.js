@@ -8,6 +8,8 @@ import {users} from '../../users/models/sociallyzer.usersModel.js';
 
 //custom modules
 
+let commentWeight = 4, likeWeight = 1; // these weights are used in the logic for sorting posts in the descending order of engagement
+
 let stopWords = [
     "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "has", "he", 
     "in", "is", "it", "its", "of", "on", "that", "the", "to", "was", "were", "will", 
@@ -195,11 +197,27 @@ export default class Post {
             return {success:true,posts:[],message:"No relevant posts found...",code:404}
         }
 
-        if(limit != infinity){
+        matchingPosts.sort((a,b)=>{ // sorts the matching posts in the descending order of engagement
+            let aScore = (a.comments * commentWeight) + (a.likes * likeWeight);
+            let bScore = (b.comments * commentWeight) + (b.likes * likeWeight);
+            return ( bScore - aScore );
+        })
+        
+        let result = [...matchingPosts];
+        
+        // pagination logic
+        if(limit != Infinity){
+            if(limit < 1 || pageNumber < 1 || pageNumber > Math.ceil(matchingPosts.length/limit) ) { // the third condition checks if the page number requested is below the number of pages available
+                return {success:false,data:null,message:"Invalid Pagination Parameters",code:400}
+            }
+            let paginatedPosts = [];
             let lowerIndex = (pageNumber - 1) * limit;
-            let upperIndex = 
+            let upperIndex = (pageNumber * limit);
+            paginatedPosts = result.slice(lowerIndex,upperIndex);
+            result = [...paginatedPosts];
         }
-        return {success:true,posts:matchingPosts,message:"Search results fetched!",code:200}
+
+        return {success:true,data:{posts:result,page:pageNumber},message:"Search results fetched!",code:200}
     }
     static getDrafts(userId){
         // userId is extracted from the JWT token. Hence no additional verification is needed
@@ -210,11 +228,8 @@ export default class Post {
         return {success:true,code:200,message:"Draft posts fetched successfully", data:draftPosts};
     }
     static toggleArchive(userId,postId){
-        let index = posts.findIndex(p=>p.id===postId && !p.isDraft);
-        if(index<0){
-            return {success:false,code:404,message:"Post does not exist"}
-        }
-        let ownerOfThePost = posts[index].userId;
+        
+        posts[index].userId;
         if(ownerOfThePost !== userId){
             return {success:false,code:403,message:"Unauthorized"}
         }
