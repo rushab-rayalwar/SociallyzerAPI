@@ -112,7 +112,11 @@ export default class Post {
         }
         //pagination logic
         let totalPages = 1;
-        if(limit != Infinity){ 
+        if(limit != Infinity){
+
+            limit = Number(limit); // this makes sure that the parameters are treated as numbers and not a string
+            page = Number(page);
+
             if(limit < 1){
                 return {data:null,success:false,code:400,message:"Limit parameter cannot be less than 1"}
             }
@@ -155,6 +159,10 @@ export default class Post {
         //pagination logic
         let totalPages = 1;
         if(limit != Infinity){ 
+            
+            limit = Number(limit); // this makes sure that the parameters are treated as numbers and not a string
+            page = Number(page);
+
             if(limit < 1){
                 return {data:null,found:false,code:400,message:"Limit parameter cannot be less than 1"}
             }
@@ -194,6 +202,10 @@ export default class Post {
         //pagination logic
         let totalPages = 1;
         if(limit != Infinity){ 
+            
+            limit = Number(limit); // this makes sure that the parameters are treated as numbers and not a string
+            page = Number(page);
+            
             if(limit < 1){
                 return {data:null,success:false,code:400,message:"Limit parameter cannot be less than 1"}
             }

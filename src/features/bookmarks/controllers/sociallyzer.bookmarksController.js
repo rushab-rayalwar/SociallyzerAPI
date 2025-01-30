@@ -28,7 +28,7 @@ export default class BookmarksController {
         let limit = req.query.limit; // pagination parameters
         let page = req.query.page;
 
-        let response = Bookmark.getBookmarks(postId,userId,limit,page);
+        let response = Bookmark.getBookmarks(userId,limit,page);
         if(response.success){
             return res.status(response.code).json({success:response.success,message:response.message,data:response.data})
         } else {

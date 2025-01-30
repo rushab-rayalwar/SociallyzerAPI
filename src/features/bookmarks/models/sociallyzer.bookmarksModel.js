@@ -26,18 +26,18 @@ export default class Bookmark {
             let bookmarkObject = bookmarks[index];
             let postBookmarkIndex = bookmarkObject.postIds.indexOf(postId);
             if(postBookmarkIndex >= 0){  // post is already bookmarked by the user
-                bookmarks[index].postIds.splice(postBookmarkIndex,1);
+                bookmarks[index].postIds.splice(postBookmarkIndex,1); console.log('bookmarks',bookmarks);
                 isBookmarkAdded = false;
                 if(bookmarks[index].postIds.length === 0){
-                    bookmarks.splice(index,1);
+                    bookmarks.splice(index,1); console.log('bookmarks',bookmarks);
                 }
             }
             else{ // post is being bookmarked by the user
-                bookmarks[index].postIds.push(postId);
+                bookmarks[index].postIds.push(postId); console.log('bookmarks',bookmarks);
             }
         }else{ // bookmark object for the post does not exist
             let bookmark = new Bookmark(userId,postId);
-            bookmarks.push(bookmark);
+            bookmarks.push(bookmark); console.log('bookmarks',bookmarks);
         }
 
         let message = isBookmarkAdded ? 'Post added to bookmarks' : 'Post removed from bookmarks';
@@ -45,19 +45,9 @@ export default class Bookmark {
         return {success:true,message,code:200}
     }
 
-    static getBookmarks(postId,userId,limit=Infinity,page=1){
+    static getBookmarks(userId,limit=Infinity,page=1){
         let bookmarkedPosts = [];
         let message = '';
-
-        let post = posts.find(p=>p.id === postId);
-        if(!post){
-            return {success:false,message:"Invalid Post ID",code:400,data:null}
-        }
-
-        let userIsAuthorized = (post.userId === userId);
-        if(!userIsAuthorized){
-            return {success:false,message:"Unauthorized",code:403,data:null}
-        }
 
         let bookmarkObject = bookmarks.find(b=>b.bookmarkedBy === userId);
         if(!bookmarkObject || bookmarkObject.postIds.length === 0) {

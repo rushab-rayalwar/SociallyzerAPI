@@ -41,6 +41,9 @@ export default class Like {
                 posts[postIndexInPostsArray].likes = Math.max(0, posts[postIndexInPostsArray].likes - 1); // ensuring it does not go below 0 in case of an error
                 let indexOfPostInTheLikedPostsArray = users[userIndexInUsersArray].likedPosts.indexOf(postId); 
                 users[userIndexInUsersArray].likedPosts.splice(indexOfPostInTheLikedPostsArray,1);
+                if(likes[likeIndexInLikesArray].likedBy.length === 0){
+                    likes.splice(likeIndexInLikesArray,1);
+                }
                 return {code:200,message:"Like Removed",success:true};
             }
         }
