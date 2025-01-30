@@ -15,6 +15,7 @@ import authenticateUser from './src/middlewares/sociallyzer.middleware.userAuthe
 import likesRouter from './src/features/likes/routers/sociallyzer.likesRouter.js';
 import commentsRouter from './src/features/comments/routers/sociallyzer.commentsRouter.js';
 import docs from './src/docs/swagger.json' assert {type:'json'}; // NOTE
+import bookmarksRouter from './src/features/bookmarks/routers/sociallyzer.bookmarksController.js';
 
 let app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/users',userRouter);
 app.use('/api/posts',authenticateUser,postsRouter); 
 app.use('/api/likes',authenticateUser,likesRouter);
 app.use('/api/comments',authenticateUser,commentsRouter);
+app.use('/api/bookmarks',authenticateUser,bookmarksRouter);
 app.use('/api/docs',swagger.serve,swagger.setup(docs));
 
 app.get('/',(req,res)=>{return res.status(200).json({success:true,message:'Welcome to Sociallyzer!'})});
