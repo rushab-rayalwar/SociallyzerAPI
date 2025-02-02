@@ -35,7 +35,7 @@ app.get('/',(req,res)=>{return res.status(200).json({success:true,message:'Welco
 
 app.use(errorHandler); // handle errors
 app.use((req,res)=>{   // handle invalid url requests
-    return res.status(404).json({success:false,message:'Oops! The requested url does not exist.'});
+    return res.status(404).json({success:false,message:'The requested URL was not found. Please check the documentation for the correct URL: /api/docs'});
 });
 
 export default app;

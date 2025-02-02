@@ -1,100 +1,78 @@
 {
-    "swagger":"2.0",
-    "info":{
-        "version":"1.0.0",
-        "title":"SociallyzerAPI",
-        "description": "Sociallyzer API is a feature-rich social networking API built as a learning project. It includes functionalities such as user authentication, post creation, editing, and deletion, as well as features like liking, commenting, and filtering posts by interactions or keywords. With pagination, draft saving, and archiving capabilities, Sociallyzer demonstrates efficient RESTful API design and implementation."
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Sociallyzer API Documentation",
+        "description": "Sociallyzer is a RESTful API for a social media platform, allowing users to create, like, comment, and manage posts. Features include user authentication, bookmarking, saving drafts, archiving posts, sorting by engagement, and pagination. Designed for efficiency and scalability.",
+        "version": "1.0.0"
     },
-    "tags":[
+    "servers": [
         {
-            "name":"Users",
-            "description":"Endpoints related to user operations"
+            "url": "http://localhost:3000"
         }
     ],
-    "host":"localhost:3000",
-    "schemes":["http"],
-    "paths":{
-
-        "/api/users/register":{
-            "post":{
-                "tags":["Users"],
-                "summary":"User Account Registration",
-                "description":"For creating a new user account.",
-                "parameters":[
-                    {
-                        "in":"body",
-                        "name":"Data",
-                        "description":"User Account Credentials",
-                        "schema":{
-                            "type":"object",
-                            "properties":{
-                                "name":{
-                                    "type":"string",
-                                    "example":"John Doe",
-                                    "description":"Name of the user."
-                                },
-                                "email":{
-                                    "type":"string",
-                                    "example":"johndoe@abc.com",
-                                    "description":"User's Email ID"
-                                },
-                                "password":{
-                                    "type":"string",
-                                    "example":"abc123#",
-                                    "description":"User's password"
+    "paths": {
+        "/api/users/register": {
+            "post": {
+                "summary": "Register a new user",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties":{
+                                    "name":{"type":"string","example":"Rushab Rayalwar"},
+                                    "email":{"type":"string","example":"rushabrayalwar@gmail.com"},
+                                    "password":{"type":"string","example":"abdc"}
                                 }
                             }
                         }
                     }
-                ],
-                "responses":{
-                    "201":{
-                        "description":"User Registration Successfull.",
-                        "schema":{
-                            "type":"object",
-                            "properties":{
-                                "success":{
-                                    "type":"boolean",
-                                    "description":"Indicates if the operation was successfull."
-                                },
-                                "message":{
-                                    "type":"string",
-                                    "description":"Information about the operation"
-                                },
-                                "userId":{
-                                    "type":"string",
-                                    "description":"User ID of the new account."
+                },
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User registered successfully"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "userId": {
+                                            "type": "string",
+                                            "example": "5f7b7b7b7b7b7b7b7b7b7b7b"
+                                        }
+                                    }
                                 }
-                            },
-                            "example":{
-                                "success":true,
-                                "message":"User Registration Successfull.",
-                                "userId":"xyz123#"
-                            }
-                        }
-                    },
-                    "400":{
-                        "description":"Bad Request: Invalid User Data",
-                        "schema":{
-                            "type":"object",
-                            "properties":{
-                                "success":{
-                                    "type":"boolean",
-                                    "description":"Indicates if the operation was successfull."
-                                },
-                                "message":{
-                                    "type":"string",
-                                    "description":"Information about the operation"
-                                } 
-                            },
-                            "example":{
-                                "success":false,
-                                "message":"Invalid User Data"
                             }
                         }
                     }
                 }
             }
-        }
+        },
+        "api/users/login": {
+            "post": {
+                "summary": "Login a user",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "rushabrayalwar@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "abdc"
+                                    }
+                                }
+                            }
+                        }
+
     }
 }

@@ -39,7 +39,14 @@ export default class PostController {
     }
     getUserPosts(req,res){
         let userID = req.tokenPayload.userId;
-        let posts = PostsModel.getForUser(userID);
+
+        let limit = req.query.limit; // pagination parameters
+        let page = req.query.page;
+
+        let sort = !!req.query.sort; // parameter to fetch posts in the descending order of engagement
+
+        let response = PostsModel.getUserPosts(userID,limit,page,sort);
+
         if(posts.found){
             return res.status(posts.code).json({success:true,data:response.data,message:posts.message})
         } else {
@@ -48,7 +55,13 @@ export default class PostController {
     }
     getPostsForUserId(req,res){
         let userId = req.params.userId;
-        let posts = PostsModel.getPostsForUserId(userId);
+
+        let limit = req.query.limit; // pagination parameters
+        let page = req.query.page;
+
+        let sort = !!req.query.sort; // parameter to fetch posts in the descending order of engagement
+
+        let posts = PostsModel.getPostsForUserId(userId,limit,page,sort);
         if(posts.success){
             return res.status(posts.code).json({success:true,message:posts.message,data:posts.data})
         } else {
@@ -98,7 +111,7 @@ export default class PostController {
         }
     }
     
-    search(req,res){
+    search(req,res){ // fetches matching posts in the descending order of engagement
         let query = req.query.query; // search query
 
         let pageNumber = req.query.page; // parameters for pagination

@@ -17,7 +17,7 @@ export default class UserController {
             if(response.success){
                 return res.status(201).json({
                     success: true,
-                    message: 'User Registration Successfull.',  
+                    message: 'User registered successfully.',  
                     userId: response.user.userId,
                 });
             } else {

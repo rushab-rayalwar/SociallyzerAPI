@@ -142,7 +142,7 @@ export default class Post {
             return {found:false, details:null, code:404, message:"Post not found or access deined"};
         }
     }
-    static getForUser(userID,limit=Infinity,page=1,sort=false){         // for posts posted by the user sending the request
+    static getUserPosts(userID,limit=Infinity,page=1,sort=false){         // for posts posted by the user sending the request
         let postsForUser = posts.filter(p=>p.userId === userID && !p.isDraft && !p.isArchived);
         if(postsForUser.length < 1 ){
             return {found:false, details:null,code:200,message:'Nothing posted yet!'}
@@ -177,7 +177,7 @@ export default class Post {
 
         return {found:true, data:{posts:resultPosts,page,totalPages},code:200,message:"Posts retrieved successfully"}
     }
-    static getPostsForUserId(userId){       // for any other user's posts
+    static getPostsForUserId(userId,limit=infinite,page=1,sort=false){       // for any other user's posts
         let userExists = users.some(u=>{
             if(u.id===userId){
                 return true;
