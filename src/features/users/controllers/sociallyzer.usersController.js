@@ -15,13 +15,13 @@ export default class UserController {
         if(name,email,password){
         let response = User.addUser(name,email,password);
             if(response.success){
-                return res.status(201).json({
+                return res.status(response.code).json({
                     success: true,
-                    message: 'User registered successfully.',  
-                    userId: response.user.userId,
+                    message: response.message,  
+                    userId: response.userId,
                 });
             } else {
-                throw new ApplicationError(400,"Invalid User Data");
+                throw new ApplicationError(response.code,response.message);
             }
         }
     }
@@ -29,7 +29,7 @@ export default class UserController {
         let {email,password} = req.body;
 
         let alreadyLoggedIn = false;
-        if(req.cookies.jwt){  // the client would send a JWT (token) if someone had already logged in
+        if(req.cookies.jwt){  // a JWT cookie would be present if someone had already logged in
             let tokenPayload = jwt.verify(req.cookies.jwt,process.env.JWT_SECRET);
             alreadyLoggedIn = (tokenPayload.email === email);
         }
@@ -63,7 +63,7 @@ export default class UserController {
         if(response.success){
             return res.status(response.code).clearCookie('jwt').json({message:response.message,success:response.success}) // clears the jwt token
         } else {
-            return res.status(response.code).json({message:response.message,success:response.success})
+            throw new ApplicationError(response.code,response.message);
         }
     }
     //instance methods

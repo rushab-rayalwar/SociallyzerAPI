@@ -14,6 +14,7 @@
         "/api/users/register": {
             "post": {
                 "summary": "Register a new user",
+                "tags": [ "Users"],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -50,29 +51,157 @@
                                 }
                             }
                         }
-                    }
-                }
-            }
-        },
-        "api/users/login": {
-            "post": {
-                "summary": "Login a user",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "example": "rushabrayalwar@gmail.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "example": "abdc"
+                    },
+                    "400": {
+                        "description": "User already exists / Missing required fields",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User already exists"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "userId": {
+                                            "type":"null",
+                                            "example": null
+                                        }
                                     }
                                 }
                             }
                         }
-
+                    }
+                }
+            }
+        },
+        "/api/users/login": {
+            "post": {
+                "summary": "Login a user",
+                "tags": [ "Users"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties":{
+                                    "email":{"type":"string","example":"rushabrayalwar@gmail.com"},
+                                    "password":{"type":"string","example":"abdc"}
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "responses": {
+                "200": {
+                    "description": "User logged in successfully",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Login Successfull"
+                                    },
+                                    "success": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "userId": {
+                                        "type": "string",
+                                        "example": "5f7b7b7b7b7b7b7b7b7b7b7b"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Invalid credentials",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Invalid credentials"
+                                    },
+                                    "success": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "userId": {
+                                        "type":"null",
+                                        "example": null
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/logout": {
+            "post": {
+                "summary": "Logout a user",
+                "tags": [ "Users"],
+                "requestBody": {
+                    "content": {
+                        "null": { }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User logged out successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logout Successfull / User not logged in"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }            
+        }
+    },
+    "components": {
+        "tags": [
+            {
+                "name": "Users",
+                "description": "User management"
+            }
+        ]
     }
 }
