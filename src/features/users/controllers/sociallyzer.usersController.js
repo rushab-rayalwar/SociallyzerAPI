@@ -27,7 +27,6 @@ export default class UserController {
     }
     static handleLogin(req,res){
         let {email,password} = req.body;
-
         let alreadyLoggedIn = false;
         if(req.cookies.jwt){  // a JWT cookie would be present if someone had already logged in
             let tokenPayload = jwt.verify(req.cookies.jwt,process.env.JWT_SECRET);

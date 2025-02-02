@@ -22,7 +22,7 @@ export default class PostController {
             new ApplicationError(response.code,response.message)
         }
         if(response.data.posts.length > 0){
-            return res.status(200).json({success:true,data:response.data});
+            return res.status(200).json({success:true,data:response.data,message:response.message});
         } else {
             new ApplicationError(404,'Nothing posted yet!');
         }

@@ -128,7 +128,7 @@ export default class Post {
             let upperIndex = lowerIndex + limit;
             resultPosts = resultPosts.slice(lowerIndex,upperIndex);
         }
-        return {data:{posts:resultPosts,page,totalPages},success:true,code:200,message:"Posts retrieved successfully"};
+        return {data:{posts:resultPosts,page,totalPages},success:true,code:200,message:"Posts fetched successfully"};
     }
     static getById(postId,userId){
         let post = posts.find(p=>{

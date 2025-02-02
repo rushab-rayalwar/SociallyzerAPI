@@ -5,6 +5,7 @@ import './dotenvConfig.js';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import swagger from 'swagger-ui-express';
+import cors from 'cors';
 
 //custom modules
 import userRouter from './src/features/users/routers/sociallyzer.usersRouter.js';
@@ -19,6 +20,7 @@ import bookmarksRouter from './src/features/bookmarks/routers/sociallyzer.bookma
 
 let app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({extended:true}));

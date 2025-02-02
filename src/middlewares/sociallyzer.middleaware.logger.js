@@ -13,9 +13,9 @@ let logger = winston.createLogger({
         }),
         winston.format.printf(({level,message,timestamp,reqURL,reqBody,errCode})=>{  // NOTE: the object being passed to the printf function is called the info object
             if(!errCode){
-                return `[SOCIALLYZER] [${level.toUpperCase()}] [${timestamp}] message:${message} reqURL: ${reqURL} reqBody:${JSON.stringify(reqBody)}`;
+                return `[SOCIALLYZER] [${level.toUpperCase()}] [${timestamp}] message:${message}, reqURL: ${reqURL}, reqBody:${JSON.stringify(reqBody)}`;
             } else {
-                return `[SOCIALLYZER] [${level.toUpperCase()}] [${timestamp}] message:${message} errorCode: ${errCode} reqURL: ${reqURL} reqBody:${JSON.stringify(reqBody)}`;
+                return `[SOCIALLYZER] [${level.toUpperCase()}] [${timestamp}] message:${message}, errorCode: ${errCode}, reqURL: ${reqURL}, reqBody:${JSON.stringify(reqBody)}`;
             }
         })
     ),

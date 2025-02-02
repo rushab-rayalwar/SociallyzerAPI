@@ -65,10 +65,6 @@
                                         "success": {
                                             "type": "boolean",
                                             "example": false
-                                        },
-                                        "userId": {
-                                            "type":"null",
-                                            "example": null
                                         }
                                     }
                                 }
@@ -93,49 +89,45 @@
                             }
                         }
                     }
-                }
-            },
-            "responses": {
-                "200": {
-                    "description": "User logged in successfully",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "Login Successfull"
-                                    },
-                                    "success": {
-                                        "type": "boolean",
-                                        "example": true
-                                    },
-                                    "userId": {
-                                        "type": "string",
-                                        "example": "5f7b7b7b7b7b7b7b7b7b7b7b"
+                },
+                "responses": {
+                    "200": {
+                        "description": "User logged in successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login Successfull"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "userId": {
+                                            "type": "string",
+                                            "example": "5f7b7b7b7b7b7b7b7b7b7b7b"
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                },
-                "401": {
-                    "description": "Invalid credentials",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "Invalid credentials"
-                                    },
-                                    "success": {
-                                        "type": "boolean",
-                                        "example": false
-                                    },
-                                    "userId": {
-                                        "type":"null",
-                                        "example": null
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid credentials"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
                                     }
                                 }
                             }
@@ -194,6 +186,162 @@
                     }
                 }
             }            
+        },
+        "api/posts/all":{
+            "get":{
+                "summary":"Get all posts",
+                "tags":["Posts"],
+                "parameters":[
+                    {
+                        "name":"page",
+                        "in":"query",
+                        "description":"Page number",
+                        "required":false,
+                        "schema":{
+                            "type":"number",
+                            "example":1
+                        }
+                    },
+                    {
+                        "name":"limit",
+                        "in":"query",
+                        "description":"Number of posts per page",
+                        "required":false,
+                        "schema":{
+                            "type":"number",
+                            "example":10
+                        }
+                    },
+                    {
+                        "name":"sort",
+                        "in":"query",
+                        "description":"Sort by engagement",
+                        "required":false,
+                        "schema":{
+                            "type":"string",
+                            "example":"likes"
+                        }
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Posts fetched successfully",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "properties":{
+                                        "message":{
+                                            "type":"string",
+                                            "example":"Posts fetched successfully"
+                                        },
+                                        "success":{
+                                            "type":"boolean",
+                                            "example":true
+                                        },
+                                        "data":{
+                                            "type":"object",
+                                            "items":{
+                                                "properties":{
+                                                    "posts":{
+                                                        "type":"array",
+                                                        "items":{
+                                                            "properties":{
+                                                                "userId":{
+                                                                    "type":"string",
+                                                                    "example":"5f7b7b7b7b7b7b7b7b7b7b7b",
+                                                                    "description":"User ID of the post's author"
+                                                                },
+                                                                "userName":{
+                                                                    "type":"string",
+                                                                    "example":"Rushab Rayalwar",
+                                                                    "description":"Name of the post's author. Can be used to display the author's name on the frontend" 
+                                                                },
+                                                                "caption":{
+                                                                    "type":"string",
+                                                                    "example":"Hello World",
+                                                                    "description":"Caption of the post"
+                                                                },
+                                                                "id":{
+                                                                    "type":"string",
+                                                                    "example":"5f7b7b7b7b7b7b7b7b7b7b7b",
+                                                                    "description":"Post ID"
+                                                                },
+                                                                "pictureUrl":{
+                                                                    "type":"string",
+                                                                    "example":"https://www.example.com/picture.jpg",
+                                                                    "description":"URL of the post's picture"
+                                                                },
+                                                                "timestamp":{
+                                                                    "type":"string",
+                                                                    "example":"245254245",
+                                                                    "description":"Timestamp of the post in milliseconds"
+                                                                },
+                                                                "imageFileExtension":{
+                                                                    "type":"string",
+                                                                    "example":".jpg",
+                                                                    "description":"Necessary for correctly accessing the image file"
+                                                                },
+                                                                "likes":{
+                                                                    "type":"number",
+                                                                    "example":10,
+                                                                    "description":"Number of likes on the post"
+                                                                },
+                                                                "comments":{
+                                                                    "type":"number",
+                                                                    "example":5,
+                                                                    "description":"Number of comments on the post"
+                                                                },
+                                                                "captioKeywords":{
+                                                                    "type":"array",
+                                                                    "items":{
+                                                                        "type":"string",
+                                                                        "example":"Hello",
+                                                                        "description":"Keywords extracted from the caption for search purposes"
+                                                                    }
+                                                                },
+                                                                "isDraft":{
+                                                                    "type":"boolean",
+                                                                    "example":false,
+                                                                    "description":"Indicates if the post is a draft"
+                                                                },
+                                                                "isArchived":{
+                                                                    "type":"boolean",
+                                                                    "example":false,
+                                                                    "description":"Indicates if the post is archived"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                    },
+                    "400":{
+                        "description":"Invalid page number / limit",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "properties":{
+                                        "message":{
+                                            "type":"string",
+                                            "example":"Limit parameter cannot be less than 1"
+                                        },
+                                        "success":{
+                                            "type":"boolean",
+                                            "example":false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -201,6 +349,10 @@
             {
                 "name": "Users",
                 "description": "User management"
+            },
+            {
+                "name": "Posts",
+                "description": "Post management"
             }
         ]
     }
